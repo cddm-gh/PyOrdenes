@@ -1,11 +1,12 @@
 __author__ = 'gorydev'
+# Version 1.1
 
 import equipo
 import MySQLdb
 import time
 
 try:
-    db = MySQLdb.connect("localhost","root","Darkgo13","celulares")
+    db = MySQLdb.connect("localhost", "root", "Darkgo13", "celulares")
     cursor = db.cursor()
 except MySQLdb.Error, e:
     print("Ocurrio un error al intentar conectar con la BD: ", e[1])
@@ -20,7 +21,7 @@ def crear_orden():
         eq = equipo.Equipo()
         cursor.execute("SELECT norden FROM orden")
         num_orden = cursor.lastrowid + 1
-        print "Numero de orden !~ ",num_orden," ~!"
+        print "Numero de orden !~ ", num_orden, " ~!"
         fec = time.strftime("%d-%m-%Y")
         mrc = raw_input("Indique marca del equipo: ")
         mod = raw_input("Indique modelo del equipo: ")
@@ -39,20 +40,20 @@ def crear_orden():
             if resp.lower() == "s":
                 try:
                     cursor.execute('''INSERT INTO orden (fecha,marca,modelo,imei,falla,status)
-                        VALUES (%s,%s,%s,%s,%s,%s)''',(eq.getfecha(),eq.getmarca(),eq.getmodelo(),
-                                                       eq.getimei(),eq.getfalla(),eq.getstatus()))
+                        VALUES (%s,%s,%s,%s,%s,%s)''',  (eq.getfecha(), eq.getmarca(), eq.getmodelo(),
+                                                         eq.getimei(), eq.getfalla(), eq.getstatus()))
                     db.commit()
                     print "Orden guardada con exito!!"
                 except MySQLdb.Error, e:
-                    print "Error al insertar valores: ",e[1]
+                    print "Error al insertar valores: ", e[1]
                     db.rollback()
                 salir = True
                 break
             elif resp.lower() == "n":
                 try:
                     cursor.execute('''INSERT INTO orden (fecha,marca,modelo,imei,falla,status)
-                        VALUES (%s,%s,%s,%s,%s,%s)''', (eq.getfecha(),eq.getmarca(),eq.getmodelo(),
-                                                       eq.getimei(),eq.getfalla(),eq.getstatus()))
+                        VALUES (%s,%s,%s,%s,%s,%s)''', (eq.getfecha(), eq.getmarca(), eq.getmodelo(),
+                                                        eq.getimei(), eq.getfalla(), eq.getstatus()))
                     db.commit()
                     print "Orden guardada con exito!!"
                     break
@@ -95,13 +96,13 @@ def mostrar_orden(n_orden):
                 falla = registro[5]
                 estado = registro[6]
                 print "*********************DATOS ACTUALES DE LA ORDEN**********************"
-                print "Numero de orden: ",norden
-                print "Fecha de ingreso: ",fecha
-                print "Marca: ",marca
-                print "Modelo: ",modelo
-                print "IMEI: ",imei
-                print "Falla: ",falla
-                print "Status: ",estado
+                print "Numero de orden: ", norden
+                print "Fecha de ingreso: ", fecha
+                print "Marca: ", marca
+                print "Modelo: ", modelo
+                print "IMEI: ", imei
+                print "Falla: ", falla
+                print "Status: ", estado
                 print "********************LLENANDO NUEVOS DATOS*****************************"
                 fecha = time.strftime("%d-%m-%Y")
                 marca = raw_input("Nueva marca: ")
@@ -110,7 +111,8 @@ def mostrar_orden(n_orden):
                 falla = raw_input("Nueva falla: ")
                 estado = raw_input("Nuevo status: ")
                 try:
-                    cursor.execute("UPDATE orden SET fecha=%s, marca=%s, modelo=%s, imei=%s, falla=%s, status=%s WHERE norden=%s",fecha,marca,modelo,imei,falla,estado,n_orden)
+                    cursor.execute("UPDATE orden SET fecha=%s, marca=%s, modelo=%s, imei=%s, falla=%s,"
+                                   " status=%s WHERE norden=%s", fecha, marca, modelo, imei, falla, estado, n_orden)
                     db.commit()
                     print "Orden Actualizada!"
                 except MySQLdb.Error, e:
@@ -129,7 +131,7 @@ def mostrar_orden(n_orden):
 def eliminar_orden():
     n_orden = raw_input("Indique el numero de la orden que desea eliminar: ")
     try:
-        rows_affected = cursor.execute("DELETE FROM orden WHERE norden=%s",n_orden)
+        rows_affected = cursor.execute("DELETE FROM orden WHERE norden=%s", n_orden)
         if rows_affected >= 1:
             confirmacion = raw_input("Confirme la eliminacion de la orden si-no: ")
             if confirmacion.lower() == "si":
@@ -138,7 +140,7 @@ def eliminar_orden():
             else:
                 db.rollback()
         else:
-            print "No se encontre la orden numero: ",n_orden," verifique"
+            print "No se encontre la orden numero: ", n_orden, " verifique"
     except MySQLdb.Error, e:
         print "Error: ", e[1]
         db.rollback()
