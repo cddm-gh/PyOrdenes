@@ -18,7 +18,6 @@ eq = equipo.Equipo()
 
 
 def pedir_datos():
-    # TODO validar los datos de entrada
     valido = False
     reg = re.compile("^[0-9]{15}$")
     while not valido:
@@ -63,13 +62,11 @@ def pedir_datos():
 def crear_orden():
     salir = False
     while not salir:
-        cursor.execute("SELECT norden FROM orden")
         # FIXME mostrar el numero de orden que corresponde
-        num_orden = cursor.lastrowid + 1
+        num_orden = str(cursor.lastrowid)
         print("Numero de orden !~ ", num_orden, " ~!")
-        fec = time.strftime("%d-%m-%Y")
         pedir_datos()
-        # TODO: Buscar como enviar el objeto equipo para llenar sus datos en otra funcion
+        fec = time.strftime("%d-%m-%Y")
         eq.setfecha(fec)
         eq.setstatus("Pendiente")
 
@@ -143,15 +140,15 @@ def mostrar_orden(n_orden):
                 print "Falla: ", falla
                 print "Status: ", estado
                 print "********************LLENANDO NUEVOS DATOS*****************************"
-                fecha = time.strftime("%d-%m-%Y")
+                # TODO: Verificar que estos datos cumplan las condiciones
                 marca = raw_input("Nueva marca: ")
                 modelo = raw_input("Nuevo modelo: ")
                 imei = raw_input("Nuevo imei: ")
                 falla = raw_input("Nueva falla: ")
                 estado = raw_input("Nuevo status: ")
                 try:
-                    cursor.execute("UPDATE orden SET fecha=%s, marca=%s, modelo=%s, imei=%s, falla=%s,"
-                                   " status=%s WHERE norden=%s", fecha, marca, modelo, imei, falla, estado, n_orden)
+                    cursor.execute("UPDATE orden SET marca=%s, modelo=%s, imei=%s, falla=%s, "
+                                   "status=%s WHERE norden=%s", (marca, modelo, imei, falla, estado, n_orden))
                     db.commit()
                     print "Orden Actualizada!"
                 except MySQLdb.Error, e:
