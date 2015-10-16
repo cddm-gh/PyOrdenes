@@ -57,6 +57,7 @@ def pedir_datos():
                 valido = True
                 eq.setfalla(fal)
                 break
+    return valido
 
 
 def crear_orden():
@@ -117,6 +118,68 @@ def modificar_orden():
                 print "Opcion incorrecta!"
 
 
+def validar_datos(n_orden):
+    valido = False
+    reg = re.compile("^[0-9]{15}$")
+    while not valido:
+        while True:
+            mrc = raw_input("Indique marca del equipo: ")
+            if len(mrc) < 3:
+                print "Indique una marca valida"
+                valido = False
+            else:
+                valido = True
+                eq.setmarca(mrc)
+                break
+        while True:
+            mod = raw_input("Indique modelo del equipo: ")
+            if len(mod) < 3:
+                print "Indique un modelo valido"
+                valido = False
+            else:
+                valido = True
+                eq.setmodelo(mod)
+                break
+        while True:
+            ime = raw_input("Indique imei del equipo: ")
+            if not re.match(reg, ime):
+                print "Error el IMEI debe ser solo numeros y contener 15 digitos!"
+                valido = False
+            else:
+                valido = True
+                eq.setimei(ime)
+                break
+        while True:
+            fal = raw_input("Indique falla del equipo: ")
+            if len(fal) < 5:
+                print "Por favor especifique mejor la falla"
+                valido = False
+            else:
+                valido = True
+                eq.setfalla(fal)
+                break
+        while True:
+            sta = raw_input("Indique status del equipo: ")
+            if len(sta) < 5:
+                print "Por favor especifique mejor la falla"
+                valido = False
+            else:
+                valido = True
+                eq.setstatus(sta)
+                break
+    if valido:
+        try:
+            cursor.execute("UPDATE orden SET marca=%s, modelo=%s, imei=%s, falla=%s, "
+                            "status=%s WHERE norden=%s", (mrc, mod, ime, fal, sta, n_orden))
+            db.commit()
+            print "Orden Actualizada!"
+        except MySQLdb.Error, e:
+            print "Error al actualizar: ", e[1]
+            db.rollback()
+    else:
+        print "Error los nuevos datos no cumplen las condiciones de formato"
+
+
 def mostrar_orden(n_orden):
     try:
         rows_affected = cursor.execute("SELECT * FROM orden WHERE norden=%s",n_orden)
@@ -140,20 +203,7 @@ def mostrar_orden(n_orden):
                 print "Falla: ", falla
                 print "Status: ", estado
                 print "********************LLENANDO NUEVOS DATOS*****************************"
-                # TODO: Verificar que estos datos cumplan las condiciones
-                marca = raw_input("Nueva marca: ")
-                modelo = raw_input("Nuevo modelo: ")
-                imei = raw_input("Nuevo imei: ")
-                falla = raw_input("Nueva falla: ")
-                estado = raw_input("Nuevo status: ")
-                try:
-                    cursor.execute("UPDATE orden SET marca=%s, modelo=%s, imei=%s, falla=%s, "
-                                   "status=%s WHERE norden=%s", (marca, modelo, imei, falla, estado, n_orden))
-                    db.commit()
-                    print "Orden Actualizada!"
-                except MySQLdb.Error, e:
-                    print "Error al actualizar: ", e[1]
-                    db.rollback()
+                validar_datos(n_orden)
         else:
             print "Orden no encontrada verifique e intente nuevamente."
             return False
