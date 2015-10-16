@@ -13,13 +13,14 @@ except MySQLdb.Error, e:
     print("Ocurrio un error al intentar conectar con la BD: ", e[1])
 
 rep_menu = True
+eq = equipo.Equipo()
 # Opcion 1
 
 
 def pedir_datos():
     # TODO validar los datos de entrada
     valido = False
-    reg = re.compile("^[0-9]{1,15}$")
+    reg = re.compile("^[0-9]{15}$")
     while not valido:
         while True:
             mrc = raw_input("Indique marca del equipo: ")
@@ -28,6 +29,7 @@ def pedir_datos():
                 valido = False
             else:
                 valido = True
+                eq.setmarca(mrc)
                 break
         while True:
             mod = raw_input("Indique modelo del equipo: ")
@@ -36,6 +38,7 @@ def pedir_datos():
                 valido = False
             else:
                 valido = True
+                eq.setmodelo(mod)
                 break
         while True:
             ime = raw_input("Indique imei del equipo: ")
@@ -44,6 +47,7 @@ def pedir_datos():
                 valido = False
             else:
                 valido = True
+                eq.setimei(ime)
                 break
         while True:
             fal = raw_input("Indique falla del equipo: ")
@@ -52,25 +56,21 @@ def pedir_datos():
                 valido = False
             else:
                 valido = True
+                eq.setfalla(fal)
                 break
 
 
 def crear_orden():
     salir = False
     while not salir:
-        eq = equipo.Equipo()
         cursor.execute("SELECT norden FROM orden")
         # FIXME mostrar el numero de orden que corresponde
         num_orden = cursor.lastrowid + 1
-        print "Numero de orden !~ ", num_orden, " ~!"
+        print("Numero de orden !~ ", num_orden, " ~!")
         fec = time.strftime("%d-%m-%Y")
         pedir_datos()
         # TODO: Buscar como enviar el objeto equipo para llenar sus datos en otra funcion
         eq.setfecha(fec)
-        eq.setmarca(mrc)
-        eq.setmodelo(mod)
-        eq.setimei(ime)
-        eq.setfalla(fal)
         eq.setstatus("Pendiente")
 
         while True:
