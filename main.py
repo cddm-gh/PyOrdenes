@@ -106,7 +106,7 @@ def modificar_orden():
     salgo = False
     while not salgo:
         n_orden = raw_input("Indique el numero de orden que desea modificar: ")
-        salgo = mostrar_orden(n_orden)
+        salgo = validar_datos(n_orden)
         while True:
             resp = raw_input("Quiere modificar otra orden? si-no: ")
             if resp.lower() == "si":
@@ -179,10 +179,12 @@ def validar_datos(n_orden):
     else:
         print "Error los nuevos datos no cumplen las condiciones de formato"
 
+    return valido
+
 
 def mostrar_orden(n_orden):
     try:
-        rows_affected = cursor.execute("SELECT * FROM orden WHERE norden=%s",n_orden)
+        rows_affected = cursor.execute("SELECT * FROM orden WHERE norden=%s", n_orden)
         db.commit()
         if rows_affected >= 1:
             resultados = cursor.fetchall()
@@ -202,8 +204,7 @@ def mostrar_orden(n_orden):
                 print "IMEI: ", imei
                 print "Falla: ", falla
                 print "Status: ", estado
-                print "********************LLENANDO NUEVOS DATOS*****************************"
-                validar_datos(n_orden)
+                print "**********************************************************************"
         else:
             print "Orden no encontrada verifique e intente nuevamente."
             return False
@@ -256,13 +257,19 @@ def mostrar_ordenes():
         break
 
 
+def buscar_orden():
+    n_orden = raw_input("Indique el numero de la orden que quiere ver: ")
+    mostrar_orden(n_orden)
+
+
 while rep_menu:
     print "********************MENU*************************"
     print "1- Crear nueva orden"
     print "2- Modificar orden"
     print "3- Eliminar orden"
     print "4- Mostrar ordenes"
-    print "5- Salir del programa"
+    print "5- Buscar orden"
+    print "6- Salir del programa"
     opcion = raw_input("Indique su opcion: ")
     print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     if opcion == "1":
@@ -274,6 +281,8 @@ while rep_menu:
     elif opcion == "4":
         mostrar_ordenes()
     elif opcion == "5":
+        buscar_orden()
+    elif opcion == "6":
         print "Saliendo del sistema"
         rep_menu = False
         db.close()
