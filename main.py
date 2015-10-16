@@ -4,6 +4,7 @@ __author__ = 'gorydev'
 import equipo
 import MySQLdb
 import time
+import re
 
 try:
     db = MySQLdb.connect("localhost", "root", "Darkgo13", "celulares")
@@ -15,18 +16,56 @@ rep_menu = True
 # Opcion 1
 
 
+def pedir_datos():
+    # TODO validar los datos de entrada
+    valido = False
+    reg = re.compile("^[0-9]{1,15}$")
+    while not valido:
+        while True:
+            mrc = raw_input("Indique marca del equipo: ")
+            if len(mrc) < 3:
+                print "Indique una marca valida"
+                valido = False
+            else:
+                valido = True
+                break
+        while True:
+            mod = raw_input("Indique modelo del equipo: ")
+            if len(mod) < 3:
+                print "Indique un modelo valido"
+                valido = False
+            else:
+                valido = True
+                break
+        while True:
+            ime = raw_input("Indique imei del equipo: ")
+            if not re.match(reg, ime):
+                print "Error el IMEI debe ser solo numeros y contener 15 digitos!"
+                valido = False
+            else:
+                valido = True
+                break
+        while True:
+            fal = raw_input("Indique falla del equipo: ")
+            if len(fal) < 5:
+                print "Por favor especifique mejor la falla"
+                valido = False
+            else:
+                valido = True
+                break
+
+
 def crear_orden():
     salir = False
     while not salir:
         eq = equipo.Equipo()
         cursor.execute("SELECT norden FROM orden")
+        # FIXME mostrar el numero de orden que corresponde
         num_orden = cursor.lastrowid + 1
         print "Numero de orden !~ ", num_orden, " ~!"
         fec = time.strftime("%d-%m-%Y")
-        mrc = raw_input("Indique marca del equipo: ")
-        mod = raw_input("Indique modelo del equipo: ")
-        ime = raw_input("Indique imei del equipo: ")
-        fal = raw_input("Indique falla del equipo: ")
+        pedir_datos()
+        # TODO: Buscar como enviar el objeto equipo para llenar sus datos en otra funcion
         eq.setfecha(fec)
         eq.setmarca(mrc)
         eq.setmodelo(mod)
