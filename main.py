@@ -1,10 +1,11 @@
 import equipo
+import cliente
 import MySQLdb
 import time
 import re
 
 __author__ = 'gorydev'
-# Version 1.1
+# Version 1.2
 
 try:
     db = MySQLdb.connect("localhost", "root", "Darkgo13", "celulares")
@@ -14,6 +15,7 @@ except MySQLdb.Error, e:
 
 rep_menu = True
 eq = equipo.Equipo()
+cl = cliente.Cliente()
 # Opcion 1
 
 
@@ -57,6 +59,27 @@ def pedir_datos():
                 valido = True
                 eq.setfalla(fal)
                 break
+
+        # Datos del cliente
+        while True:
+            nom = raw_input("Indique el nombre del cliente: ")
+            if len(nom) < 6:
+                print "Por favor indique nombre y apellido"
+                valido = False
+            else:
+                valido = True
+                cl.set_name(nom)
+                break
+
+        while True:
+            id = raw_input("Indique cedula-rif del cliente: ")
+            if len(id) < 5:
+                print "Por favor indique un dato correcto"
+                valido = False
+            else:
+                valido = True
+                cl.set_id(id)
+                break
     return valido
 
 
@@ -76,9 +99,10 @@ def crear_orden():
             resp = raw_input()
             if resp.lower() == "s":
                 try:
-                    cursor.execute('''INSERT INTO orden (fecha,marca,modelo,imei,falla,status)
-                        VALUES (%s,%s,%s,%s,%s,%s)''', (eq.getfecha(), eq.getmarca(), eq.getmodelo(),
-                                                         eq.getimei(), eq.getfalla(), eq.getstatus()))
+                    cursor.execute('''INSERT INTO orden (fecha,marca,modelo,imei,falla,status,nombre,id)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)''', (eq.getfecha(), eq.getmarca(), eq.getmodelo(),
+                                                         eq.getimei(), eq.getfalla(), eq.getstatus(),
+                                                              cl.get_name(), cl.get_id()))
                     db.commit()
                     print "Orden guardada con exito!!"
                 except MySQLdb.Error, e:
@@ -88,9 +112,10 @@ def crear_orden():
                 break
             elif resp.lower() == "n":
                 try:
-                    cursor.execute('''INSERT INTO orden (fecha,marca,modelo,imei,falla,status)
-                        VALUES (%s,%s,%s,%s,%s,%s)''', (eq.getfecha(), eq.getmarca(), eq.getmodelo(),
-                                                        eq.getimei(), eq.getfalla(), eq.getstatus()))
+                    cursor.execute('''INSERT INTO orden (fecha,marca,modelo,imei,falla,status,nombre,id)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)''', (eq.getfecha(), eq.getmarca(), eq.getmodelo(),
+                                                        eq.getimei(), eq.getfalla(), eq.getstatus(),
+                                                              cl.get_name(), cl.get_id()))
                     db.commit()
                     print "Orden guardada con exito!!"
                     break
@@ -182,10 +207,15 @@ def validar_datos(n_orden):
 
     return valido
 
+def buscar_orden():
+    num_orden = raw_input("Indique el numero de la orden que quiere ver: ")
+    mostrar_orden(num_orden)
 
-def mostrar_orden(n_orden):
+
+def mostrar_orden(num_orden):
+    print type(num_orden)
     try:
-        rows_affected = cursor.execute("SELECT * FROM orden WHERE norden=%s", n_orden)
+        rows_affected = cursor.execute("SELECT * FROM orden WHERE norden=%s", num_orden)
         db.commit()
         if rows_affected >= 1:
             resultados = cursor.fetchall()
@@ -197,7 +227,11 @@ def mostrar_orden(n_orden):
                 imei = registro[4]
                 falla = registro[5]
                 estado = registro[6]
+                nombre = registro[7]
+                id = registro[8]
                 print "*********************DATOS ACTUALES DE LA ORDEN**********************"
+                print "Cliente: ", nombre
+                print "ID: ", id
                 print "Numero de orden: ", norden
                 print "Fecha de ingreso: ", fecha
                 print "Marca: ", marca
@@ -246,7 +280,11 @@ def mostrar_ordenes():
             imei = registro[4]
             falla = registro[5]
             estado = registro[6]
+            nombre = registro[7]
+            id = registro[8]
             print "****************************************************"
+            print "Cliente: ", nombre
+            print "ID: ", id
             print "Numero de orden: ", norden
             print "Fecha de ingreso: ", fecha
             print "Marca: ", marca
@@ -256,11 +294,6 @@ def mostrar_ordenes():
             print "Status: ", estado
             print "****************************************************"
         break
-
-
-def buscar_orden():
-    n_orden = raw_input("Indique el numero de la orden que quiere ver: ")
-    mostrar_orden(n_orden)
 
 
 while rep_menu:
