@@ -1,10 +1,10 @@
-__author__ = 'gorydev'
-# Version 1.1
-
 import equipo
 import MySQLdb
 import time
 import re
+
+__author__ = 'gorydev'
+# Version 1.1
 
 try:
     db = MySQLdb.connect("localhost", "root", "Darkgo13", "celulares")
@@ -77,7 +77,7 @@ def crear_orden():
             if resp.lower() == "s":
                 try:
                     cursor.execute('''INSERT INTO orden (fecha,marca,modelo,imei,falla,status)
-                        VALUES (%s,%s,%s,%s,%s,%s)''',  (eq.getfecha(), eq.getmarca(), eq.getmodelo(),
+                        VALUES (%s,%s,%s,%s,%s,%s)''', (eq.getfecha(), eq.getmarca(), eq.getmodelo(),
                                                          eq.getimei(), eq.getfalla(), eq.getstatus()))
                     db.commit()
                     print "Orden guardada con exito!!"
@@ -110,6 +110,7 @@ def modificar_orden():
         while True:
             resp = raw_input("Quiere modificar otra orden? si-no: ")
             if resp.lower() == "si":
+                salgo = False
                 break
             elif resp.lower() == "no":
                 salgo = True
