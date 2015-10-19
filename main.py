@@ -18,11 +18,51 @@ eq = equipo.Equipo()
 cl = cliente.Cliente()
 # Opcion 1
 
+def buscar_cliente(id):
+    print type(id)
+    encontrado = False
+    try:
+        row_aff = cursor.execute("SELECT * FROM clientes WHERE id=%s", id)
+        db.commit()
+        print row_aff
+        if row_aff >= 1:
+            encontrado = True
+        else:
+            encontrado = False
+    except MySQLdb.Error, e:
+        print "Error en la consulta: ", e[1]
+        db.rollback()
+    return encontrado
+
 
 def pedir_datos():
     valido = False
     reg = re.compile("^[0-9]{15}$")
     while not valido:
+        # Datos del cliente
+        # TODO: verificar el id del cliente para saber si ya esta en la bd o hay que crearlo
+        while True:
+            id = raw_input("Indique cedula-rif del cliente: ")
+            if len(id) < 5:
+                print "Por favor indique un dato correcto"
+                valido = False
+            else:
+                encontrado = buscar_cliente(id)
+                if not encontrado:
+                    print "No existe ningun cliente con esa cedula-rif"
+                    while True:
+                        nom = raw_input("Indique el nombre del cliente: ")
+                        if len(nom) < 6:
+                            print "Por favor indique nombre y apellido"
+                            valido = False
+                        else:
+                            valido = True
+                            cl.set_name(nom)
+                            break
+                valido = True
+                cl.set_id(id)
+                break
+
         while True:
             mrc = raw_input("Indique marca del equipo: ")
             if len(mrc) < 3:
@@ -60,26 +100,6 @@ def pedir_datos():
                 eq.setfalla(fal)
                 break
 
-        # Datos del cliente
-        while True:
-            nom = raw_input("Indique el nombre del cliente: ")
-            if len(nom) < 6:
-                print "Por favor indique nombre y apellido"
-                valido = False
-            else:
-                valido = True
-                cl.set_name(nom)
-                break
-
-        while True:
-            id = raw_input("Indique cedula-rif del cliente: ")
-            if len(id) < 5:
-                print "Por favor indique un dato correcto"
-                valido = False
-            else:
-                valido = True
-                cl.set_id(id)
-                break
     return valido
 
 
@@ -298,12 +318,9 @@ def mostrar_ordenes():
 
 while rep_menu:
     print "********************MENU*************************"
-    print "1- Crear nueva orden"
-    print "2- Modificar orden"
-    print "3- Eliminar orden"
-    print "4- Mostrar ordenes"
-    print "5- Buscar orden"
-    print "6- Salir del programa"
+    print "1- Crear nueva orden\n2- Modificar orden"
+    print "3- Eliminar orden\n4- Mostrar ordenes"
+    print "5- Buscar orden\n6- Salir del programa"
     opcion = raw_input("Indique su opcion: ")
     print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     if opcion == "1":
